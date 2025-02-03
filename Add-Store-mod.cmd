@@ -27,6 +27,9 @@ for /f %%i in ('dir /b *VCLibs*140*.appx 2^>nul ^| find /i "x64"') do set "VCLib
 for /f %%i in ('dir /b *VCLibs*140*.appx 2^>nul ^| find /i "arm64"') do set "VCLibsA64=%%i"
 for /f %%i in ('dir /b *VCLibs*140*.appx 2^>nul ^| find /i "x86"') do set "VCLibsX86=%%i"
 for /f %%i in ('dir /b *VCLibs*140*.appx 2^>nul ^| find /i "arm_"') do set "VCLibsA32=%%i"
+for /f %%i in ('dir /b *WindowsAppRuntime.1.5*.msix 2^>nul ^| find /i "x64"') do set "RT15X64=%%i"
+for /f %%i in ('dir /b *WindowsAppRuntime.1.5*.msix 2^>nul ^| find /i "arm64"') do set "RT15A64=%%i"
+for /f %%i in ('dir /b *WindowsAppRuntime.1.5*.msix 2^>nul ^| find /i "x86"') do set "RT15X86=%%i"
 
 if exist "*StorePurchaseApp*.appxbundle" if exist "*StorePurchaseApp*.xml" (
 for /f %%i in ('dir /b *StorePurchaseApp*.appxbundle 2^>nul') do set "PurchaseApp=%%i"
@@ -144,8 +147,141 @@ echo.
 1>nul 2>nul %PScommand% Add-AppxProvisionedPackage -Online -PackagePath %XboxIdentity% -DependencyPackagePath %DepXbox% -LicensePath Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml
 %PScommand% Add-AppxPackage -Path %XboxIdentity%
 )
-goto :fin
 
+for /f "tokens=6 delims=[]. " %%G in ('ver') do if %%G geq 22000 goto wt
+:wtchoice
+set "choice="
+set /p choice="Do you want to install Windows Terminal?(Y/N): "
+set choice=%choice:~0,1%
+if /i "%choice%"=="Y" (
+    goto wt
+) else if /i "%choice%"=="N" (
+    goto calcchoice
+) else (
+    goto wtchoice
+)
+
+:wt
+for /f %%i in ('dir /b Microsoft.WindowsTerminal_*_8wekyb3d8bbwe.msixbundle_Windows10_PreinstallKit 2^>nul') do set "WTDIR=%%i"
+for /f %%i in ('dir /b %WTDIR%\*.msixbundle 2^>nul') do set "WTFILE=%%i"
+for /f %%i in ('dir /b %WTDIR%\*.xml 2^>nul') do set "WTLICFILE=%%i"
+
+set WT=%WTDIR%\%WTFILE%
+set WTLIC=%WTDIR%\%WTLICFILE%
+
+echo.
+echo ============================================================
+echo Adding Windows Terminal
+echo ============================================================
+echo.
+1>nul 2>nul %PScommand% Add-AppxProvisionedPackage -Online -PackagePath %WT% -LicensePath %WTLIC%
+%PScommand% Add-AppxPackage -Path %WT%
+
+:calcchoice
+set "choice="
+set /p choice="Do you want to install UWP Calculator?(Y/N): "
+set choice=%choice:~0,1%
+if /i "%choice%"=="Y" (
+    goto calc
+) else if /i "%choice%"=="N" (
+    goto w11only
+) else (
+    goto calcchoice
+)
+
+:calc
+for /f %%i in ('dir /b *WindowsCalculator*.Msixbundle 2^>nul') do set "Calc=%%i"
+echo.
+echo ============================================================
+echo Adding UWP Calculator
+echo ============================================================
+echo.
+1>nul 2>nul %PScommand% Add-AppxProvisionedPackage -Online -PackagePath %Calc% -SkipLicense
+%PScommand% Add-AppxPackage -Path %Calc%
+
+:w11only
+for /f "tokens=6 delims=[]. " %%G in ('ver') do if %%G lss 22000 goto :fin
+echo.
+echo ============================================================
+echo Adding APP Runtime 1.5
+echo ============================================================
+echo.
+if /i %arch%==a64 (
+1>nul 2>nul %PScommand% Add-AppxProvisionedPackage -Online -PackagePath %RT15A64% -SkipLicense
+%PScommand% Add-AppxPackage -Path %RT15A64%
+)
+1>nul 2>nul %PScommand% Add-AppxProvisionedPackage -Online -PackagePath %RT15X64% -SkipLicense
+%PScommand% Add-AppxPackage -Path %RT15X64%
+1>nul 2>nul %PScommand% Add-AppxProvisionedPackage -Online -PackagePath %RT15X86% -SkipLicense
+%PScommand% Add-AppxPackage -Path %RT15X86%
+
+:paintchoice
+set "choice="
+set /p choice="Do you want to install UWP Paint?(Y/N): "
+set choice=%choice:~0,1%
+if /i "%choice%"=="Y" (
+    goto paint
+) else if /i "%choice%"=="N" (
+    goto snipchoice
+) else (
+    goto paintchoice
+)
+
+:paint
+for /f %%i in ('dir /b *Paint*.Msixbundle 2^>nul') do set "Paint=%%i"
+echo.
+echo ============================================================
+echo Adding UWP Paint
+echo ============================================================
+echo.
+1>nul 2>nul %PScommand% Add-AppxProvisionedPackage -Online -PackagePath %Paint% -SkipLicense
+%PScommand% Add-AppxPackage -Path %Paint%
+
+:snipchoice
+set "choice="
+set /p choice="Do you want to install UWP Snipping tool?(Y/N): "
+set choice=%choice:~0,1%
+if /i "%choice%"=="Y" (
+    goto snip
+) else if /i "%choice%"=="N" (
+    goto notepadchoice
+) else (
+    goto snipchoice
+)
+
+:snip
+for /f %%i in ('dir /b *ScreenSketch*.Msixbundle 2^>nul') do set "Snip=%%i"
+echo.
+echo ============================================================
+echo Adding UWP Snipping tool
+echo ============================================================
+echo.
+1>nul 2>nul %PScommand% Add-AppxProvisionedPackage -Online -PackagePath %Snip% -SkipLicense
+%PScommand% Add-AppxPackage -Path %Snip%
+
+:notepadchoice
+set "choice="
+set /p choice="Do you want to install UWP Notepad?(Y/N): "
+set choice=%choice:~0,1%
+if /i "%choice%"=="Y" (
+    goto notepad
+) else if /i "%choice%"=="N" (
+    goto fin
+) else (
+    goto notepadchoice
+)
+
+:notepad
+for /f %%i in ('dir /b *WindowsNotepad*.Msixbundle 2^>nul') do set "Notepad=%%i"
+echo.
+echo ============================================================
+echo Adding UWP Notepad
+echo ============================================================
+echo.
+1>nul 2>nul %PScommand% Add-AppxProvisionedPackage -Online -PackagePath %Notepad% -SkipLicense
+%PScommand% Add-AppxPackage -Path %Notepad%
+
+goto :fin
 :uac
 echo.
 echo ============================================================
