@@ -92,22 +92,36 @@ set "PScommand=PowerShell -NoLogo -NoProfile -NonInteractive -InputFormat None -
 
 echo.
 echo ============================================================
-echo Preparing VCLibs
+echo Preparing Libraries
 echo ============================================================
 echo.
 if /i %arch%==x64 (
 %PScommand% Add-AppxPackage -Path %VCLibsX64%
+%PScommand% Add-AppxPackage -Path %Runtime6X64%
+%PScommand% Add-AppxPackage -Path %Framework6X64%
 )
 if /i %arch%==a64 (
 %PScommand% Add-AppxPackage -Path %VCLibsX64%
+%PScommand% Add-AppxPackage -Path %Runtime6X64%
+%PScommand% Add-AppxPackage -Path %Framework6X64%
 %PScommand% Add-AppxPackage -Path %VCLibsA64%
+%PScommand% Add-AppxPackage -Path %Runtime6A64%
+%PScommand% Add-AppxPackage -Path %Framework6A64%
 )
 if /i %arch%==a6432 (
 %PScommand% Add-AppxPackage -Path %VCLibsX64%
+%PScommand% Add-AppxPackage -Path %Runtime6X64%
+%PScommand% Add-AppxPackage -Path %Framework6X64%
 %PScommand% Add-AppxPackage -Path %VCLibsA64%
+%PScommand% Add-AppxPackage -Path %Runtime6A64%
+%PScommand% Add-AppxPackage -Path %Framework6A64%
 %PScommand% Add-AppxPackage -Path %VCLibsA32%
+%PScommand% Add-AppxPackage -Path %Runtime6A32%
+%PScommand% Add-AppxPackage -Path %Framework6A32%
 )
 %PScommand% Add-AppxPackage -Path %VCLibsX86%
+%PScommand% Add-AppxPackage -Path %Runtime6X86%
+%PScommand% Add-AppxPackage -Path %Framework6X86%
 
 echo.
 echo ============================================================

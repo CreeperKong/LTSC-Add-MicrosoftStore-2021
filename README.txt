@@ -2,7 +2,7 @@ This script helps you add Microsoft Store for Windows LTSC 2021 and later.
 X86 X64 ARM64 are all supported.
 
 NOTE: Please download the package from releases
-https://github.com/CreeperKong/LTSC-Add-MicrosoftStore-2021/releases/latest/LTSC-Add-MicrosoftStore-2021.zip
+https://github.com/CreeperKong/LTSC-Add-MicrosoftStore-2021/releases/latest/download/LTSC-Add-MicrosoftStore-2021.zip
 
 Thanks for other projects as references
 - Thanks kkkgo for the base script:
