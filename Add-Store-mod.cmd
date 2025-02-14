@@ -3,8 +3,7 @@ for /f "tokens=6 delims=[]. " %%G in ('ver') do if %%G lss 19041 goto :version
 %windir%\system32\reg.exe query "HKU\S-1-5-19" 1>nul 2>nul || goto :uac
 setlocal enableextensions
 
-if /i "%PROCESSOR_ARCHITECTURE%" equ "AMD64" (set "arch=x64") else (set "arch=x86")
-if /i "%PROCESSOR_ARCHITECTURE%" equ "ARM64" (set "arch=a64") else (set "arch=x86")
+if /i "%PROCESSOR_ARCHITECTURE%" equ "AMD64" (set "arch=x64") else if /i "%PROCESSOR_ARCHITECTURE%" equ "ARM64" (set "arch=a64") else (set "arch=x86")
 
 if /i %arch%==a64 (
 for /f "tokens=6 delims=[]. " %%G in ('ver') do if %%G lss 22000 set "arch=a6432"
@@ -23,13 +22,22 @@ for /f %%i in ('dir /b *NET.Native.Runtime*2.2*.appx 2^>nul ^| find /i "x64"') d
 for /f %%i in ('dir /b *NET.Native.Runtime*2.2*.appx 2^>nul ^| find /i "arm64"') do set "Runtime6A64=%%i"
 for /f %%i in ('dir /b *NET.Native.Runtime*2.2*.appx 2^>nul ^| find /i "x86"') do set "Runtime6X86=%%i"
 for /f %%i in ('dir /b *NET.Native.Runtime*2.2*.appx 2^>nul ^| find /i "arm_"') do set "Runtime6A32=%%i"
-for /f %%i in ('dir /b *VCLibs*140*.appx 2^>nul ^| find /i "x64"') do set "VCLibsX64=%%i"
-for /f %%i in ('dir /b *VCLibs*140*.appx 2^>nul ^| find /i "arm64"') do set "VCLibsA64=%%i"
-for /f %%i in ('dir /b *VCLibs*140*.appx 2^>nul ^| find /i "x86"') do set "VCLibsX86=%%i"
-for /f %%i in ('dir /b *VCLibs*140*.appx 2^>nul ^| find /i "arm_"') do set "VCLibsA32=%%i"
+for /f %%i in ('dir /b *VCLibs.140.00_*.appx 2^>nul ^| find /i "x64"') do set "VCLibsX64=%%i"
+for /f %%i in ('dir /b *VCLibs.140.00_*.appx 2^>nul ^| find /i "arm64"') do set "VCLibsA64=%%i"
+for /f %%i in ('dir /b *VCLibs.140.00_*.appx 2^>nul ^| find /i "x86"') do set "VCLibsX86=%%i"
+for /f %%i in ('dir /b *VCLibs.140.00_*.appx 2^>nul ^| find /i "arm_"') do set "VCLibsA32=%%i"
+for /f %%i in ('dir /b *VCLibs.140.00.UWPDesktop*.appx 2^>nul ^| find /i "x64"') do set "VCLibsUX64=%%i"
+for /f %%i in ('dir /b *VCLibs.140.00.UWPDesktop*.appx 2^>nul ^| find /i "arm64"') do set "VCLibsUA64=%%i"
+for /f %%i in ('dir /b *VCLibs.140.00.UWPDesktop*.appx 2^>nul ^| find /i "x86"') do set "VCLibsUX86=%%i"
+for /f %%i in ('dir /b *VCLibs.140.00.UWPDesktop*.appx 2^>nul ^| find /i "arm_"') do set "VCLibsUA32=%%i"
 for /f %%i in ('dir /b *WindowsAppRuntime.1.5*.msix 2^>nul ^| find /i "x64"') do set "RT15X64=%%i"
 for /f %%i in ('dir /b *WindowsAppRuntime.1.5*.msix 2^>nul ^| find /i "arm64"') do set "RT15A64=%%i"
 for /f %%i in ('dir /b *WindowsAppRuntime.1.5*.msix 2^>nul ^| find /i "x86"') do set "RT15X86=%%i"
+for /f %%i in ('dir /b *UI.Xaml.2.8*.appx 2^>nul ^| find /i "x64"') do set "XAML28X64=%%i"
+for /f %%i in ('dir /b *UI.Xaml.2.8*.appx 2^>nul ^| find /i "arm64"') do set "XAML28A64=%%i"
+for /f %%i in ('dir /b *UI.Xaml.2.8*.appx 2^>nul ^| find /i "x86"') do set "XAML28X86=%%i"
+for /f %%i in ('dir /b *UI.Xaml.2.8*.appx 2^>nul ^| find /i "arm_"') do set "XAML28A32=%%i"
+
 
 if exist "*StorePurchaseApp*.appxbundle" if exist "*StorePurchaseApp*.xml" (
 for /f %%i in ('dir /b *StorePurchaseApp*.appxbundle 2^>nul') do set "PurchaseApp=%%i"
@@ -62,27 +70,27 @@ if /i "%choice%"=="Y" (
 
 :checkarch
 if /i %arch%==x64 (
-set "DepStore=%VCLibsX64%,%VCLibsX86%,%Framework6X64%,%Framework6X86%,%Runtime6X64%,%Runtime6X86%"
-set "DepPurchase=%VCLibsX64%,%VCLibsX86%,%Framework6X64%,%Framework6X86%,%Runtime6X64%,%Runtime6X86%"
-set "DepXbox=%VCLibsX64%,%VCLibsX86%,%Framework6X64%,%Framework6X86%,%Runtime6X64%,%Runtime6X86%"
-set "DepInstaller=%VCLibsX64%,%VCLibsX86%"
+    set "DepStore=%VCLibsX64%,%VCLibsUX64%,%XAML28X64%,%VCLibsX86%,%VCLibsUX86%,%XAML28X86%,%Framework6X64%,%Framework6X86%,%Runtime6X64%,%Runtime6X86%"
+    set "DepPurchase=%VCLibsX64%,%VCLibsUX64%,%XAML28X64%,%VCLibsX86%,%VCLibsUX86%,%XAML28X86%,%Framework6X64%,%Framework6X86%,%Runtime6X64%,%Runtime6X86%"
+    set "DepXbox=%VCLibsX64%,%VCLibsUX64%,%XAML28X64%,%VCLibsX86%,%VCLibsUX86%,%XAML28X86%,%Framework6X64%,%Framework6X86%,%Runtime6X64%,%Runtime6X86%"
+    set "DepInstaller=%VCLibsX64%,%VCLibsUX64%,%XAML28X64%,%VCLibsX86%,%VCLibsUX86%,%XAML28X86%"
 ) else if /i %arch%==a6432 (
-set "DepStore=%VCLibsX64%,%VCLibsX86%,%Framework6X64%,%Framework6X86%,%Runtime6X64%,%Runtime6X86%,%VCLibsA64%,%VCLibsA32%,%Framework6A64%,%Framework6A32%,%Runtime6A64%,%Runtime6A32%"
-set "DepPurchase=%VCLibsX64%,%VCLibsX86%,%Framework6X64%,%Framework6X86%,%Runtime6X64%,%Runtime6X86%,%VCLibsA64%,%VCLibsA32%,%Framework6A64%,%Framework6A32%,%Runtime6A64%,%Runtime6A32%"
-set "DepXbox=%VCLibsX64%,%VCLibsX86%,%Framework6X64%,%Framework6X86%,%Runtime6X64%,%Runtime6X86%,%VCLibsA64%,%VCLibsA32%,%Framework6A64%,%Framework6A32%,%Runtime6A64%,%Runtime6A32%"
-set "DepInstaller=%VCLibsX64%,%VCLibsX86%,%VCLibsA64%,%VCLibsA32%"
+    set "DepStore=%VCLibsX64%,%VCLibsUX64%,%XAML28X64%,%VCLibsX86%,%VCLibsUX86%,%XAML28X86%,%Framework6X64%,%Framework6X86%,%Runtime6X64%,%Runtime6X86%,%VCLibsA64%,%VCLibsUA64%,%XAML28A64%,%VCLibsA32%,%VCLibsUA32%,%XAML28A32%,%Framework6A64%,%Framework6A32%,%Runtime6A64%,%Runtime6A32%"
+    set "DepPurchase=%VCLibsX64%,%VCLibsUX64%,%XAML28X64%,%VCLibsX86%,%VCLibsUX86%,%XAML28X86%,%Framework6X64%,%Framework6X86%,%Runtime6X64%,%Runtime6X86%,%VCLibsA64%,%VCLibsUA64%,%XAML28A64%,%VCLibsA32%,%VCLibsUA32%,%XAML28A32%,%Framework6A64%,%Framework6A32%,%Runtime6A64%,%Runtime6A32%"
+    set "DepXbox=%VCLibsX64%,%VCLibsUX64%,%XAML28X64%,%VCLibsX86%,%VCLibsUX86%,%XAML28X86%,%Framework6X64%,%Framework6X86%,%Runtime6X64%,%Runtime6X86%,%VCLibsA64%,%VCLibsUA64%,%XAML28A64%,%VCLibsA32%,%VCLibsUA32%,%XAML28A32%,%Framework6A64%,%Framework6A32%,%Runtime6A64%,%Runtime6A32%"
+    set "DepInstaller=%VCLibsX64%,%VCLibsUX64%,%XAML28X64%,%VCLibsX86%,%VCLibsUX86%,%XAML28X86%,%VCLibsA64%,%VCLibsUA64%,%XAML28A64%,%VCLibsA32%,%VCLibsUA32%,%XAML28A32%"
 ) else if /i %arch%==a64 (
-set "DepStore=%VCLibsX64%,%VCLibsX86%,%Framework6X64%,%Framework6X86%,%Runtime6X64%,%Runtime6X86%,%VCLibsA64%,%Framework6A64%,%Runtime6A64%"
-set "DepPurchase=%VCLibsX64%,%VCLibsX86%,%Framework6X64%,%Framework6X86%,%Runtime6X64%,%Runtime6X86%,%VCLibsA64%,%Framework6A64%,%Runtime6A64%"
-set "DepXbox=%VCLibsX64%,%VCLibsX86%,%Framework6X64%,%Framework6X86%,%Runtime6X64%,%Runtime6X86%,%VCLibsA64%,%Framework6A64%,%Runtime6A64%"
-set "DepInstaller=%VCLibsX64%,%VCLibsX86%,%VCLibsA64%"
-)
+    set "DepStore=%VCLibsX64%,%VCLibsUX64%,%XAML28X64%,%VCLibsX86%,%VCLibsUX86%,%XAML28X86%,%Framework6X64%,%Framework6X86%,%Runtime6X64%,%Runtime6X86%,%VCLibsA64%,%VCLibsUA64%,%XAML28A64%,%Framework6A64%,%Runtime6A64%"
+    set "DepPurchase=%VCLibsX64%,%VCLibsUX64%,%XAML28X64%,%VCLibsX86%,%VCLibsUX86%,%XAML28X86%,%Framework6X64%,%Framework6X86%,%Runtime6X64%,%Runtime6X86%,%VCLibsA64%,%VCLibsUA64%,%XAML28A64%,%Framework6A64%,%Runtime6A64%"
+    set "DepXbox=%VCLibsX64%,%VCLibsUX64%,%XAML28X64%,%VCLibsX86%,%VCLibsUX86%,%XAML28X86%,%Framework6X64%,%Framework6X86%,%Runtime6X64%,%Runtime6X86%,%VCLibsA64%,%VCLibsUA64%,%XAML28A64%,%Framework6A64%,%Runtime6A64%"
+    set "DepInstaller=%VCLibsX64%,%VCLibsUX64%,%XAML28X64%,%VCLibsX86%,%VCLibsUX86%,%XAML28X86%,%VCLibsA64%,%VCLibsUA64%,%XAML28A64%"
 ) else (
-set "DepStore=%VCLibsX86%,%Framework6X86%,%Runtime6X86%"
-set "DepPurchase=%VCLibsX86%,%Framework6X86%,%Runtime6X86%"
-set "DepXbox=%VCLibsX86%,%Framework6X86%,%Runtime6X86%"
-set "DepInstaller=%VCLibsX86%"
+    set "DepStore=%VCLibsX86%,%VCLibsUX86%,%XAML28X86%,%Framework6X86%,%Runtime6X86%"
+    set "DepPurchase=%VCLibsX86%,%VCLibsUX86%,%XAML28X86%,%Framework6X86%,%Runtime6X86%"
+    set "DepXbox=%VCLibsX86%,%VCLibsUX86%,%XAML28X86%,%Framework6X86%,%Runtime6X86%"
+    set "DepInstaller=%VCLibsX86%,%VCLibsUX86%,%XAML28X86%"
 )
+
 
 for %%i in (%DepStore%) do (
 if not exist "%%i" goto :nofiles
@@ -93,35 +101,58 @@ set "PScommand=PowerShell -NoLogo -NoProfile -NonInteractive -InputFormat None -
 echo.
 echo ============================================================
 echo Preparing Libraries
+echo %DepStore%
 echo ============================================================
 echo.
+
+goto prepare
+
 if /i %arch%==x64 (
 %PScommand% Add-AppxPackage -Path %VCLibsX64%
+%PScommand% Add-AppxPackage -Path %VCLibsUX64%
+%PScommand% Add-AppxPackage -Path %XAML28X64%
 %PScommand% Add-AppxPackage -Path %Runtime6X64%
 %PScommand% Add-AppxPackage -Path %Framework6X64%
 )
 if /i %arch%==a64 (
 %PScommand% Add-AppxPackage -Path %VCLibsX64%
+%PScommand% Add-AppxPackage -Path %VCLibsUX64%
+%PScommand% Add-AppxPackage -Path %XAML28X64%
 %PScommand% Add-AppxPackage -Path %Runtime6X64%
 %PScommand% Add-AppxPackage -Path %Framework6X64%
 %PScommand% Add-AppxPackage -Path %VCLibsA64%
+%PScommand% Add-AppxPackage -Path %VCLibsUA64%
+%PScommand% Add-AppxPackage -Path %XAML28A64%
 %PScommand% Add-AppxPackage -Path %Runtime6A64%
 %PScommand% Add-AppxPackage -Path %Framework6A64%
 )
 if /i %arch%==a6432 (
 %PScommand% Add-AppxPackage -Path %VCLibsX64%
+%PScommand% Add-AppxPackage -Path %VCLibsUX64%
+%PScommand% Add-AppxPackage -Path %XAML28X64%
 %PScommand% Add-AppxPackage -Path %Runtime6X64%
 %PScommand% Add-AppxPackage -Path %Framework6X64%
 %PScommand% Add-AppxPackage -Path %VCLibsA64%
+%PScommand% Add-AppxPackage -Path %VCLibsUA64%
+%PScommand% Add-AppxPackage -Path %XAML28A64%
 %PScommand% Add-AppxPackage -Path %Runtime6A64%
 %PScommand% Add-AppxPackage -Path %Framework6A64%
 %PScommand% Add-AppxPackage -Path %VCLibsA32%
+%PScommand% Add-AppxPackage -Path %VCLibsUA32%
+%PScommand% Add-AppxPackage -Path %XAML28A32%
 %PScommand% Add-AppxPackage -Path %Runtime6A32%
 %PScommand% Add-AppxPackage -Path %Framework6A32%
 )
 %PScommand% Add-AppxPackage -Path %VCLibsX86%
+%PScommand% Add-AppxPackage -Path %VCLibsUX86%
+%PScommand% Add-AppxPackage -Path %XAML28X86%
 %PScommand% Add-AppxPackage -Path %Runtime6X86%
 %PScommand% Add-AppxPackage -Path %Framework6X86%
+
+:prepare
+for %%i in (%DepStore%) do (
+%PScommand% Add-AppxPackage -Path %%i
+)
 
 echo.
 echo ============================================================
@@ -129,9 +160,6 @@ echo Adding Microsoft Store
 echo ============================================================
 echo.
 1>nul 2>nul %PScommand% Add-AppxProvisionedPackage -Online -PackagePath %Store% -DependencyPackagePath %DepStore% -LicensePath Microsoft.WindowsStore_8wekyb3d8bbwe.xml
-for %%i in (%DepStore%) do (
-%PScommand% Add-AppxPackage -Path %%i
-)
 %PScommand% Add-AppxPackage -Path %Store%
 
 if defined PurchaseApp (
